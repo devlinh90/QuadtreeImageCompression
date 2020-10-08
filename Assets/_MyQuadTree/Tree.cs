@@ -81,13 +81,14 @@ public class Tree : MonoBehaviour
 					AddSquare(leaf);
 					AddGrass(leaf);
 					treeDatas.Add(treeData);
+
 					requestUpdate = true;
 
 				}
 			}
 		}
 
-		if (Input.GetMouseButton(1))
+		if (Input.GetMouseButton(1) && !requestUpdate)
 		{
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			float direction = -ray.origin.y / ray.direction.y;
@@ -100,16 +101,14 @@ public class Tree : MonoBehaviour
 				if (leafIndex != -1)
 				{
 					//square
-					Debug.Log(leafIndex);
 					vertexs.RemoveAt(leafIndex);
 					normals.RemoveAt(leafIndex);
 
-					indices.RemoveAt(leafIndex * 6 + 5);
-					indices.RemoveAt(leafIndex * 6 + 4);
-					indices.RemoveAt(leafIndex * 6 + 3);
-					indices.RemoveAt(leafIndex * 6 + 2);
-					indices.RemoveAt(leafIndex * 6 + 1);
-					indices.RemoveAt(leafIndex * 6);
+					indices.RemoveRange(leafIndex * 6 , 6);
+					for (int i = leafIndex * 6; i < indices.Count; i++)
+					{
+						indices[i] -= 4;
+					}
 
 					squareIndex--;
 
@@ -123,7 +122,7 @@ public class Tree : MonoBehaviour
 						grassIndices[i] -= grassMesh_vertices.Length;
 					}
 
-					grassIndex -= grassMesh_vertices.Length;
+					grassIndex--;
 
 					leaf.value = null;
 					treeDatas.RemoveAt(leafIndex);
@@ -215,9 +214,9 @@ public class Tree : MonoBehaviour
 
 		foreach (var k in grassMesh_triangles)
 		{
-			grassIndices.Add(grassIndex + k);
+			grassIndices.Add(grassIndex * grassMesh_vertices.Length + k);
 		}
-		grassIndex += grassMesh_vertices.Length;
+		grassIndex++;
 	}
 
 	private void OnDrawGizmos()
