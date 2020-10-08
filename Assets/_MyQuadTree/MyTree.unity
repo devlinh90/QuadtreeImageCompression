@@ -799,7 +799,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c1ce29dcdbef04aa4f697985530f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  depth: 7
+  depth: 4
   flatMeshFilter: {fileID: 2047835071}
   grassMeshFilter: {fileID: 108277790}
   grassMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
