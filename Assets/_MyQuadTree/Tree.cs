@@ -25,6 +25,7 @@ public class Tree : MonoBehaviour
 	// render grass
 	[SerializeField] MeshFilter grassMeshFilter;
 	[SerializeField] Mesh grassMesh;
+	[SerializeField] GameObject grassPrefab;
 
 	private bool requestUpdate;
 
@@ -33,8 +34,11 @@ public class Tree : MonoBehaviour
 	Mesh mesh1, mesh2;
 	private void Awake()
 	{
-		 mesh1 = new Mesh();
-		 mesh2 = new Mesh();
+
+		mesh1 = new Mesh();
+		mesh2 = new Mesh();
+		mesh2.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+
 		quadTree = new QuadTree<TreeData>(null, 15f, Vector2.zero, 0);
 		quadTree.SubdivdeWidthDepth(depth, quadTree);
 
@@ -111,10 +115,10 @@ public class Tree : MonoBehaviour
 	private void AddTree(QuadTree<TreeData> tree)
 	{
 		Vector3 center = new Vector3(tree.center.x, 0, tree.center.y);
-		var topLeft = center + new Vector3(-0.5f,0, 0.5f) * tree.size;
-		var topRight = center + new Vector3(0.5f,0, 0.5f) * tree.size;
-		var bottomLeft = center + new Vector3(-0.5f,0, -0.5f) * tree.size;
-		var bottomRight = center + new Vector3(0.5f,0, -0.5f) * tree.size;
+		var topLeft = center + new Vector3(-0.5f, 0, 0.5f) * tree.size;
+		var topRight = center + new Vector3(0.5f, 0, 0.5f) * tree.size;
+		var bottomLeft = center + new Vector3(-0.5f, 0, -0.5f) * tree.size;
+		var bottomRight = center + new Vector3(0.5f, 0, -0.5f) * tree.size;
 
 		vertexs.Add(bottomLeft);
 		vertexs.Add(topLeft);
@@ -136,7 +140,7 @@ public class Tree : MonoBehaviour
 
 		index++;
 	}
-	
+
 	void UpdateGrass()
 	{
 		mesh2.Clear();
@@ -147,7 +151,7 @@ public class Tree : MonoBehaviour
 		mesh2.RecalculateNormals();
 		grassMeshFilter.mesh = mesh2;
 	}
-	
+
 
 	private void AddGrass(QuadTree<TreeData> tree)
 	{

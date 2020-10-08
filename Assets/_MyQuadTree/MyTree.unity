@@ -637,7 +637,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 148.6
+  field of view: 98
   orthographic: 0
   orthographic size: 10.61
   m_Depth: -1
@@ -662,13 +662,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1875878069}
-  m_LocalRotation: {x: 0.67880076, y: 0, z: 0, w: 0.7343225}
-  m_LocalPosition: {x: 0, y: 3.06, z: -2.77}
+  m_LocalRotation: {x: 0.0072718807, y: -0.83434266, z: 0.55108833, w: 0.011009561}
+  m_LocalPosition: {x: -0.21399423, y: 12, z: 5.029091}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 85.5, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 66.89, y: -178.488, z: 0}
 --- !u!1 &1949207361
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,10 +799,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c1ce29dcdbef04aa4f697985530f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  depth: 5
+  depth: 7
   flatMeshFilter: {fileID: 2047835071}
   grassMeshFilter: {fileID: 108277790}
   grassMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  grassPrefab: {fileID: 0}
   countText: {fileID: 917839990}
 --- !u!4 &2047835070
 Transform:
