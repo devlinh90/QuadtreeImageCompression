@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TreeData
 {
@@ -13,6 +15,7 @@ public class TreeData
 }
 public class Tree : MonoBehaviour
 {
+	[Range(1, 7)]
 	public int depth = 3;
 	QuadTree<TreeData> quadTree;
 
@@ -25,23 +28,39 @@ public class Tree : MonoBehaviour
 
 	private bool requestUpdate;
 
+	[SerializeField] Text countText;
+	int count = 0;
+	Mesh mesh1, mesh2;
 	private void Awake()
 	{
-		quadTree = new QuadTree<TreeData>(null, 10f, Vector2.zero, 0);
+		 mesh1 = new Mesh();
+		 mesh2 = new Mesh();
+		quadTree = new QuadTree<TreeData>(null, 15f, Vector2.zero, 0);
 		quadTree.SubdivdeWidthDepth(depth, quadTree);
 
+	}
+
+	[ContextMenu("GCCollect")]
+	public void GCCollect()
+	{
+		GC.Collect();
 	}
 
 	private void Update()
 	{
 		if (Input.GetMouseButton(0))
 		{
-			var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			QuadTree<TreeData> leaf = quadTree.GetLeaf(pos);
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			float direction = -ray.origin.y / ray.direction.y;
+			var pos = ray.GetPoint(direction);
+
+			QuadTree<TreeData> leaf = quadTree.GetLeaf(new Vector2(pos.x, pos.z));
 			if (leaf != null)
 			{
 				if (leaf.value == null)
 				{
+					count++;
+					countText.text = count.ToString();
 					leaf.value = new TreeData(true);
 					AddTree(leaf);
 					AddGrass(leaf);
@@ -49,23 +68,23 @@ public class Tree : MonoBehaviour
 				}
 			}
 		}
-		if (Input.GetMouseButton(1))
-		{
-			var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			QuadTree<TreeData> leaf = quadTree.GetLeaf(pos);
-			if(leaf != null && leaf.value != null)
-			{
+		//if (Input.GetMouseButton(1))
+		//{
+		//	var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		//	QuadTree<TreeData> leaf = quadTree.GetLeaf(pos);
+		//	if(leaf != null && leaf.value != null)
+		//	{
 
-			}
-			if (quadTree.Remove(pos))
-			{
-				requestUpdate = true;
-			}
-		}
+		//	}
+		//	if (quadTree.Remove(pos))
+		//	{
+		//		requestUpdate = true;
+		//	}
+		//}
 		if (requestUpdate)
 		{
 			UpdateFlat();
-			//UpdateGrass();
+			UpdateGrass();
 			requestUpdate = false;
 		}
 	}
@@ -81,34 +100,21 @@ public class Tree : MonoBehaviour
 
 	void UpdateFlat()
 	{
-		////vertexs.Clear();
-		////normals.Clear();
-		////indices.Clear();
+		mesh1.Clear();
+		mesh1.SetVertices(vertexs);
+		mesh1.SetTriangles(indices, 0);
+		mesh1.SetNormals(normals);
 
-		//foreach (var tree in quadTree.GetFullTrees())
-		//{
-		//	if (tree.IsFull)
-		//	{
-		//		AddTree(tree);
-		//	}
-		//}
-
-
-		Mesh mesh = new Mesh();
-
-		mesh.SetVertices(vertexs);
-		mesh.SetTriangles(indices, 0);
-		mesh.SetNormals(normals);
-
-		flatMeshFilter.mesh = mesh;
+		flatMeshFilter.mesh = mesh1;
 	}
 
 	private void AddTree(QuadTree<TreeData> tree)
 	{
-		var topLeft = tree.center + new Vector2(-0.5f, 0.5f) * tree.size;
-		var topRight = tree.center + new Vector2(0.5f, 0.5f) * tree.size;
-		var bottomLeft = tree.center + new Vector2(-0.5f, -0.5f) * tree.size;
-		var bottomRight = tree.center + new Vector2(0.5f, -0.5f) * tree.size;
+		Vector3 center = new Vector3(tree.center.x, 0, tree.center.y);
+		var topLeft = center + new Vector3(-0.5f,0, 0.5f) * tree.size;
+		var topRight = center + new Vector3(0.5f,0, 0.5f) * tree.size;
+		var bottomLeft = center + new Vector3(-0.5f,0, -0.5f) * tree.size;
+		var bottomRight = center + new Vector3(0.5f,0, -0.5f) * tree.size;
 
 		vertexs.Add(bottomLeft);
 		vertexs.Add(topLeft);
@@ -117,7 +123,7 @@ public class Tree : MonoBehaviour
 
 		for (int i = 0; i < 4; i++)
 		{
-			normals.Add(-Vector3.forward);
+			normals.Add(Vector3.up);
 		}
 
 		indices.Add(index * 4);
@@ -130,28 +136,26 @@ public class Tree : MonoBehaviour
 
 		index++;
 	}
-
+	
 	void UpdateGrass()
 	{
+		mesh2.Clear();
+		mesh2.SetVertices(grassVertices);
+		mesh2.SetTriangles(grassIndices, 0);
+		mesh2.SetNormals(grassNormals);
 
-		Mesh mesh = new Mesh();
-		mesh.vertices = grassVertices.ToArray();
-		mesh.triangles = grassIndices.ToArray();
-		mesh.normals = grassNormals.ToArray();
-
-		mesh.SetVertices(grassVertices);
-		mesh.SetTriangles (grassIndices,0);
-		mesh.SetNormals(grassNormals);
-
-		grassMeshFilter.mesh = mesh;
+		mesh2.RecalculateNormals();
+		grassMeshFilter.mesh = mesh2;
 	}
+	
 
 	private void AddGrass(QuadTree<TreeData> tree)
 	{
 		Vector3[] vertices = grassMesh.vertices;
 		foreach (var v in vertices)
 		{
-			grassVertices.Add(v + new Vector3(tree.center.x, tree.center.y, 0));
+			Vector3 newV = new Vector3(v.x * 0.1f, 0.5f * v.y, v.z * 0.1f);
+			grassVertices.Add(newV + new Vector3(tree.center.x, 0, tree.center.y));
 
 		}
 		grassNormals.AddRange(grassMesh.normals);

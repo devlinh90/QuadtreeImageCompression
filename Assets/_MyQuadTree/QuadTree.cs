@@ -200,7 +200,7 @@ public class QuadTree<T> where T : class
 	{
 		foreach (var tree in GetLeafs())
 		{
-			Gizmos.DrawWireCube(tree.center, new Vector3(1, 1, 1) * tree.size);
+			Gizmos.DrawWireCube(new Vector3( tree.center.x,0, tree.center.y), new Vector3(1, 1, 1) * tree.size);
 		}
 	}
 
